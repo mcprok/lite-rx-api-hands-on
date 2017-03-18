@@ -56,22 +56,22 @@ public class ReactiveUserRepository implements ReactiveRepository<User> {
 	@Override
 	public Mono<User> findById(String username) {
 		User user = users.stream().filter((p) -> p.getUsername().equals(username))
-				.findFirst()
-				.orElseThrow(() -> new IllegalArgumentException("No user with username " + username + " found!"));
+						 .findFirst()
+						 .orElseThrow(() -> new IllegalArgumentException("No user with username " + username + " found!"));
 		return withDelay(Mono.just(user));
 	}
 
 
 	private Mono<User> withDelay(Mono<User> userMono) {
 		return Mono
-				.delay(Duration.ofMillis(delayInMs))
-				.then(c -> userMono);
+					   .delay(Duration.ofMillis(delayInMs))
+					   .then(c -> userMono);
 	}
 
 	private Flux<User> withDelay(Flux<User> userFlux) {
 		return Flux
-				.interval(Duration.ofMillis(delayInMs))
-				.zipWith(userFlux, (i, user) -> user);
+					   .interval(Duration.ofMillis(delayInMs))
+					   .zipWith(userFlux, (i, user) -> user);
 	}
 
 }

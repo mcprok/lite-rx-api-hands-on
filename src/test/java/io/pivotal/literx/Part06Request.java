@@ -28,8 +28,8 @@ public class Part06Request {
 	// TODO Create a StepVerifier that requests initially all values and expect a 4 values to be received
 	StepVerifier requestAllExpectFour(Flux<User> flux) {
 		return StepVerifier.create(flux)
-				.expectNextCount(4)
-				.expectComplete();
+						   .expectNextCount(4)
+						   .expectComplete();
 	}
 
 //========================================================================================
@@ -44,10 +44,10 @@ public class Part06Request {
 	// TODO Create a StepVerifier that requests initially 1 value and expects {@link User.SKYLER} then requests another value and expects {@link User.JESSE}.
 	StepVerifier requestOneExpectSkylerThenRequestOneExpectJesse(Flux<User> flux) {
 		return StepVerifier.create(flux, 1)
-				.expectNext(User.SKYLER)
-				.thenRequest(1)
-				.expectNext(User.JESSE)
-				.thenCancel();
+						   .expectNext(User.SKYLER)
+						   .thenRequest(1)
+						   .expectNext(User.JESSE)
+						   .thenCancel();
 	}
 
 //========================================================================================
@@ -56,19 +56,20 @@ public class Part06Request {
 	public void experimentWithLog() {
 		Flux<User> flux = fluxWithLog();
 		StepVerifier.create(flux, 0)
-				.thenRequest(1)
-				.expectNextMatches(u -> true)
-				.thenRequest(1)
-				.expectNextMatches(u -> true)
-				.thenRequest(2)
-				.expectNextMatches(u -> true)
-				.expectNextMatches(u -> true)
-				.verifyComplete();
+					.thenRequest(1)
+					.expectNextMatches(u -> true)
+					.thenRequest(1)
+					.expectNextMatches(u -> true)
+					.thenRequest(2)
+					.expectNextMatches(u -> true)
+					.expectNextMatches(u -> true)
+					.verifyComplete();
 	}
 
 	// TODO Return a Flux with all users stored in the repository that prints automatically logs for all Reactive Streams signals
 	Flux<User> fluxWithLog() {
 		return repository.findAll().log();
+
 	}
 
 
@@ -78,12 +79,16 @@ public class Part06Request {
 	public void experimentWithDoOn() {
 		Flux<User> flux = fluxWithDoOnPrintln();
 		StepVerifier.create(flux)
-				.expectNextCount(4)
-				.verifyComplete();
+					.expectNextCount(4)
+					.verifyComplete();
 	}
 
 	// TODO Return a Flux with all users stored in the repository that prints "Starring:" on subscribe, "firstname lastname" for all values and "The end!" on complete
 	Flux<User> fluxWithDoOnPrintln() {
-		return null;
+		return repository.findAll()
+						 .doOnSubscribe(s -> System.out.println("Starring:"))
+						 .doOnNext(user -> System.out.println(user.getFirstname() + " " + user.getLastname()))
+						 .doOnComplete(() -> System.out.println("The end!"));
 	}
+
 }

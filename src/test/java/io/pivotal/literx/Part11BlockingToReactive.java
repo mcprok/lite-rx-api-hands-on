@@ -1,5 +1,7 @@
 package io.pivotal.literx;
 
+import static org.junit.Assert.*;
+
 import java.util.Iterator;
 
 import io.pivotal.literx.domain.User;
@@ -7,8 +9,6 @@ import io.pivotal.literx.repository.BlockingRepository;
 import io.pivotal.literx.repository.BlockingUserRepository;
 import io.pivotal.literx.repository.ReactiveRepository;
 import io.pivotal.literx.repository.ReactiveUserRepository;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,13 +39,14 @@ public class Part11BlockingToReactive {
 		Flux<User> flux = blockingRepositoryToFlux(repository);
 		assertEquals("The call to findAll must be deferred until the flux is subscribed", 0, repository.getCallCount());
 		StepVerifier.create(flux)
-				.expectNext(User.SKYLER, User.JESSE, User.WALTER, User.SAUL)
-				.verifyComplete();
+					.expectNext(User.SKYLER, User.JESSE, User.WALTER, User.SAUL)
+					.verifyComplete();
 	}
 
 	// TODO Create a Flux for reading all users from the blocking repository deferred until the flux is subscribed, and run it with an elastic scheduler
 	Flux<User> blockingRepositoryToFlux(BlockingRepository<User> repository) {
-		return null;
+		return Flux.defer(() -> Flux.fromIterable(repository.findAll()))
+				   .subscribeOn(Schedulers.elastic());
 	}
 
 //========================================================================================
@@ -53,11 +54,11 @@ public class Part11BlockingToReactive {
 	@Test
 	public void fastPublisherSlowSubscriber() {
 		ReactiveRepository<User> reactiveRepository = new ReactiveUserRepository();
-		BlockingUserRepository blockingRepository = new BlockingUserRepository(new User[]{});
+		BlockingUserRepository blockingRepository = new BlockingUserRepository(new User[] {});
 		Mono<Void> complete = fluxToBlockingRepository(reactiveRepository.findAll(), blockingRepository);
 		assertEquals(0, blockingRepository.getCallCount());
 		StepVerifier.create(complete)
-				.verifyComplete();
+					.verifyComplete();
 		Iterator<User> it = blockingRepository.findAll().iterator();
 		assertEquals(User.SKYLER, it.next());
 		assertEquals(User.JESSE, it.next());
@@ -68,7 +69,9 @@ public class Part11BlockingToReactive {
 
 	// TODO Insert users contained in the Flux parameter in the blocking repository using an parallel scheduler and return a Mono<Void> that signal the end of the operation
 	Mono<Void> fluxToBlockingRepository(Flux<User> flux, BlockingRepository<User> repository) {
-		return null;
+		return flux.publishOn(Schedulers.parallel())
+				   .doOnNext(user -> repository.save(user))
+				   .then();
 	}
 
 }

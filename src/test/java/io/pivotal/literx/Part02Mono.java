@@ -20,7 +20,7 @@ public class Part02Mono {
 	public void empty() {
 		Mono<String> mono = emptyMono();
 		StepVerifier.create(mono)
-				.verifyComplete();
+					.verifyComplete();
 	}
 
 	// TODO Return an empty Mono
@@ -52,8 +52,8 @@ public class Part02Mono {
 	public void fromValue() {
 		Mono<String> mono = fooMono();
 		StepVerifier.create(mono)
-				.expectNext("foo")
-				.verifyComplete();
+					.expectNext("foo")
+					.verifyComplete();
 	}
 
 	// TODO Return a Mono that contains a "foo" value
@@ -67,7 +67,7 @@ public class Part02Mono {
 	public void error() {
 		Mono<String> mono = errorMono();
 		StepVerifier.create(mono)
-				.verifyError(IllegalStateException.class);
+					.verifyError(IllegalStateException.class);
 	}
 
 	// TODO Create a Mono that emits an IllegalStateException

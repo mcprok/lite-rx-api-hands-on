@@ -27,8 +27,8 @@ public class Part05Merge {
 	public void mergeWithInterleave() {
 		Flux<User> flux = mergeFluxWithInterleave(repository1.findAll(), repository2.findAll());
 		StepVerifier.create(flux)
-				.expectNext(MARIE, MIKE, User.SKYLER, User.JESSE, User.WALTER, User.SAUL)
-				.verifyComplete();
+					.expectNext(MARIE, MIKE, User.SKYLER, User.JESSE, User.WALTER, User.SAUL)
+					.verifyComplete();
 	}
 
 	// TODO Merge flux1 and flux2 values with interleave
@@ -44,8 +44,8 @@ public class Part05Merge {
 	public void mergeWithNoInterleave() {
 		Flux<User> flux = mergeFluxWithNoInterleave(repository1.findAll(), repository2.findAll());
 		StepVerifier.create(flux)
-				.expectNext(User.SKYLER, User.JESSE, User.WALTER, User.SAUL, MARIE, MIKE)
-				.verifyComplete();
+					.expectNext(User.SKYLER, User.JESSE, User.WALTER, User.SAUL, MARIE, MIKE)
+					.verifyComplete();
 	}
 
 	// TODO Merge flux1 and flux2 values with no interleave (flux1 values and then flux2 values)
@@ -61,8 +61,8 @@ public class Part05Merge {
 		Mono<User> marieMono = repository2.findFirst();
 		Flux<User> flux = createFluxFromMultipleMono(skylerMono, marieMono);
 		StepVerifier.create(flux)
-				.expectNext(User.SKYLER, MARIE)
-				.verifyComplete();
+					.expectNext(User.SKYLER, MARIE)
+					.verifyComplete();
 	}
 
 	// TODO Create a Flux containing the value of mono1 then the value of mono2
